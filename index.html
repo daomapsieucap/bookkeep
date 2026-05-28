@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>Bookkeep</title>
+  <link rel="stylesheet" href="styles.css" />
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com/3.4.1"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50:  '#fffbeb',
+              100: '#fef3c7',
+              400: '#fbbf24',
+              500: '#f59e0b',
+              600: '#d97706',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- marked.js for markdown rendering -->
+  <script src="https://cdn.jsdelivr.net/npm/marked@12.0.0/marked.min.js"></script>
+
+  <!-- js-yaml for frontmatter parsing/serialization -->
+  <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
+
+  <!-- browser-image-compression -->
+  <script src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.2/dist/browser-image-compression.js"></script>
+</head>
+<body class="bg-stone-50 text-stone-900 min-h-screen">
+
+  <!-- App shell -->
+  <div id="app" class="max-w-lg mx-auto min-h-screen flex flex-col pb-20">
+    <div id="screen" class="flex-1"></div>
+  </div>
+
+  <!-- Bottom navigation (shown when settings are configured) -->
+  <nav id="bottom-nav" class="hidden fixed bottom-0 left-0 right-0 bg-white border-t border-stone-200 safe-bottom z-40">
+    <div class="max-w-lg mx-auto flex">
+      <button data-nav="shelf" class="nav-btn flex-1 flex flex-col items-center py-3 gap-1 text-xs font-medium">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+        </svg>
+        <span>Shelf</span>
+      </button>
+      <button data-nav="add" class="nav-btn flex-1 flex flex-col items-center py-3 gap-1 text-xs font-medium">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+        </svg>
+        <span>Add Book</span>
+      </button>
+      <button data-nav="settings" class="nav-btn flex-1 flex flex-col items-center py-3 gap-1 text-xs font-medium">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+        <span>Settings</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Toast container -->
+  <div id="toast-container" class="fixed top-4 left-0 right-0 flex flex-col items-center gap-2 z-50 pointer-events-none px-4"></div>
+
+  <!-- Modules -->
+  <script src="github.js"></script>
+  <script src="images.js"></script>
+  <script src="store.js"></script>
+  <script src="ui/toast.js"></script>
+  <script src="ui/shelf.js"></script>
+  <script src="ui/add-edit.js"></script>
+  <script src="ui/book-detail.js"></script>
+  <script src="ui/settings.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
