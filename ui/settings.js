@@ -14,7 +14,7 @@ const SettingsScreen = (() => {
   function render(pat, owner, repo) {
     document.getElementById('screen').innerHTML = `
       <div class="px-4 pt-8 pb-2">
-        <p class="text-xs font-semibold text-yellow-600 uppercase tracking-widest mb-1">Bookkeep</p>
+        <p class="text-xs font-semibold text-blue-700 uppercase tracking-widest mb-1">Bookkeep</p>
         <h1 class="text-2xl font-bold text-stone-900">Settings</h1>
         <p class="text-sm text-stone-500 mt-1">Connect your private GitHub data repo to get started.</p>
       </div>

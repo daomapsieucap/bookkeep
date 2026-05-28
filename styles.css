@@ -2,9 +2,9 @@
 .safe-bottom { padding-bottom: env(safe-area-inset-bottom, 0); }
 
 /* Active nav state */
-.nav-btn { color: #a8a29e; transition: color 0.15s; }
-.nav-btn.active { color: #ca8a04; }
-.nav-btn:hover { color: #78716c; }
+.nav-btn { color: rgba(191,219,254,0.75); transition: color 0.15s; }
+.nav-btn.active { color: #fde047; }
+.nav-btn:hover { color: #bfdbfe; }
 
 /* Book cover aspect ratio */
 .book-cover {

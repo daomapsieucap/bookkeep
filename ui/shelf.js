@@ -33,7 +33,7 @@ const ShelfScreen = (() => {
       <div id="conn-warn" class="mx-4 mb-2 rounded-lg text-sm px-3 py-2"></div>
 
       <!-- Tabs -->
-      <div class="flex border-b border-yellow-200 px-4 gap-1 overflow-x-auto no-scrollbar">
+      <div class="flex border-b border-blue-200 px-4 gap-1 overflow-x-auto no-scrollbar">
         ${TABS.map(t => `
           <button data-tab="${t.key}"
             class="tab-btn shrink-0 px-3 py-2 text-sm font-medium border-b-2 transition-colors
