@@ -129,6 +129,33 @@ Originals are never stored. The app compresses everything client-side before upl
 
 ---
 
+## Importing from Goodreads
+
+1. On Goodreads, go to **My Books → Import and Export → Export Library**. Goodreads will email you (or prompt you to download) a file called `goodreads_library_export.csv`.
+2. In Bookkeep, open **Settings** and scroll to **Import from Goodreads**.
+3. Tap **Choose CSV file…** and select the exported file.
+4. Tap **Import** and confirm. The app will show `Importing X / Y…` progress as it creates each book entry.
+
+**What gets imported:**
+
+| Goodreads field | Bookkeep field |
+|---|---|
+| Title | title |
+| Author | author |
+| ISBN13 | isbn |
+| Binding | format (Paperback → paper, Hardcover → hardcover, Kindle → ebook) |
+| Number of Pages | total\_pages |
+| Exclusive Shelf (`read` / `currently-reading` / `to-read`) | status |
+| Date Read | finished\_date |
+| Date Added | added\_date |
+| My Review | notes body |
+
+Covers are not imported — add them individually after import via the book detail screen.
+
+Import is sequential (one GitHub API call per book), so a large library (200+ books) may take a few minutes. Do not close the tab while it runs.
+
+---
+
 ## Recovering from index drift
 
 If `books.json` ever gets out of sync with the per-book `notes.md` files (e.g. after a manual edit), go to **Settings → Rebuild books.json from notes**. The app will scan every `notes.md`, parse the frontmatter, and rewrite `books.json` from scratch. The notes files are always the authoritative source of truth.
