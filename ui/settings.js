@@ -3,8 +3,10 @@
  */
 
 const SettingsScreen = (() => {
-  let _saving    = false;
+  let _saving     = false;
   let _rebuilding = false;
+  let _importing  = false;
+  let _grFile     = null;
 
   function mount() {
     const { pat, owner, repo } = GitHub.cfg();
@@ -81,6 +83,29 @@ const SettingsScreen = (() => {
           </button>
         </div>
 
+        <!-- Goodreads import -->
+        <div class="bg-white rounded-2xl shadow-sm p-4 space-y-3">
+          <h2 class="font-semibold text-stone-700 text-sm uppercase tracking-wide">Import from Goodreads</h2>
+          <p class="text-sm text-stone-500">
+            Export your library from Goodreads (My Books → Import and Export → Export Library),
+            then select the CSV file here. Reads, ratings, and reviews are imported as notes.
+          </p>
+          <label id="gr-file-label"
+            class="flex items-center justify-center w-full py-3 rounded-xl border-2 border-dashed border-stone-300 text-stone-500 text-sm font-medium cursor-pointer active:opacity-60 gap-2">
+            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+            </svg>
+            <span id="gr-file-name">Choose CSV file…</span>
+            <input id="gr-file-input" type="file" accept=".csv,text/csv" class="hidden" />
+          </label>
+          <div id="gr-progress" class="hidden text-sm text-stone-500 italic"></div>
+          <button id="gr-import-btn"
+            class="hidden w-full py-3 rounded-xl bg-yellow-400 text-stone-900 font-bold active:opacity-80 flex items-center justify-center gap-2">
+            Import
+          </button>
+        </div>
+
         <!-- About -->
         <div class="bg-white rounded-2xl shadow-sm p-4 space-y-1">
           <h2 class="font-semibold text-stone-700 text-sm uppercase tracking-wide mb-2">About</h2>
@@ -105,6 +130,22 @@ const SettingsScreen = (() => {
 
     document.getElementById('save-settings-btn').addEventListener('click', handleSave);
     document.getElementById('rebuild-btn').addEventListener('click', handleRebuild);
+
+    document.getElementById('gr-file-input').addEventListener('change', e => {
+      _grFile = e.target.files[0] || null;
+      const nameEl = document.getElementById('gr-file-name');
+      const btn    = document.getElementById('gr-import-btn');
+      if (_grFile) {
+        nameEl.textContent = _grFile.name;
+        btn.textContent = 'Import';
+        btn.classList.remove('hidden');
+      } else {
+        nameEl.textContent = 'Choose CSV file…';
+        btn.classList.add('hidden');
+      }
+    });
+
+    document.getElementById('gr-import-btn').addEventListener('click', handleGoodreadsImport);
   }
 
   async function handleSave() {
@@ -173,6 +214,130 @@ const SettingsScreen = (() => {
       _rebuilding = false;
       btn.disabled = false;
     }
+  }
+
+  async function handleGoodreadsImport() {
+    if (_importing || !_grFile) return;
+    if (!GitHub.isConfigured()) {
+      Toast.error('Configure and save your settings first.');
+      return;
+    }
+
+    const text = await _grFile.text();
+    const rows = parseCSV(text);
+    if (rows.length < 2) {
+      Toast.error('CSV appears empty or invalid.');
+      return;
+    }
+
+    const headers = rows[0].map(h => h.trim());
+    const dataRows = rows.slice(1).filter(r => r.some(c => c.trim()));
+    if (!dataRows.length) {
+      Toast.error('No books found in CSV.');
+      return;
+    }
+
+    const total = dataRows.length;
+    if (!confirm(`Import ${total} books from Goodreads? This may take several minutes for large libraries.`)) return;
+
+    _importing = true;
+    const btn      = document.getElementById('gr-import-btn');
+    const progress = document.getElementById('gr-progress');
+    btn.disabled   = true;
+    btn.innerHTML  = `<div class="spinner" style="border-color:rgba(26,26,26,0.2);border-top-color:#1c1917;width:18px;height:18px"></div> Importing…`;
+    progress.classList.remove('hidden');
+
+    let imported = 0;
+    let failed   = 0;
+
+    for (let i = 0; i < dataRows.length; i++) {
+      progress.textContent = `Importing ${i + 1} / ${total}…`;
+      const fields = mapGoodreadsRow(headers, dataRows[i]);
+      if (!fields) { failed++; continue; }
+      try {
+        await Store.addBook(fields);
+        imported++;
+      } catch (e) {
+        console.warn('Failed to import:', fields.title, e);
+        failed++;
+      }
+    }
+
+    Store.invalidateIndex();
+    _importing   = false;
+    _grFile      = null;
+    btn.disabled = false;
+    btn.classList.add('hidden');
+    document.getElementById('gr-file-name').textContent = 'Choose CSV file…';
+    document.getElementById('gr-file-input').value = '';
+    progress.textContent = `Done. ${imported} imported${failed ? `, ${failed} failed` : ''}.`;
+    Toast.success(`Imported ${imported} book${imported !== 1 ? 's' : ''} from Goodreads.`);
+  }
+
+  /** Minimal CSV parser that handles quoted fields and doubled-quote escapes. */
+  function parseCSV(text) {
+    const rows  = [];
+    let row     = [];
+    let field   = '';
+    let inQuote = false;
+
+    for (let i = 0; i < text.length; i++) {
+      const ch   = text[i];
+      const next = text[i + 1];
+
+      if (inQuote) {
+        if (ch === '"' && next === '"') { field += '"'; i++; }
+        else if (ch === '"')            { inQuote = false; }
+        else                            { field += ch; }
+      } else {
+        if      (ch === '"')  { inQuote = true; }
+        else if (ch === ',')  { row.push(field); field = ''; }
+        else if (ch === '\n') { row.push(field); field = ''; rows.push(row); row = []; }
+        else if (ch !== '\r') { field += ch; }
+      }
+    }
+    if (field || row.length) { row.push(field); rows.push(row); }
+    return rows;
+  }
+
+  /** Map one Goodreads CSV row → Store.addBook() fields object, or null if no title. */
+  function mapGoodreadsRow(headers, cols) {
+    const get = name => (cols[headers.indexOf(name)] || '').trim();
+
+    const title = get('Title');
+    if (!title) return null;
+
+    // Goodreads ISBNs look like ="9780316769174" — strip the Excel formula wrapper
+    const rawIsbn = get('ISBN13') || get('ISBN');
+    const isbn    = rawIsbn.replace(/^="?|"?$/g, '');
+
+    const shelfMap  = { read: 'finished', 'currently-reading': 'reading', 'to-read': 'want-to-read' };
+    const status    = shelfMap[get('Exclusive Shelf')] || 'want-to-read';
+
+    const bindingRaw = get('Binding').toLowerCase();
+    let format = 'paper';
+    if (bindingRaw.includes('kindle') || bindingRaw.includes('ebook') || bindingRaw === 'digital') format = 'ebook';
+    else if (bindingRaw.includes('hardcover') || bindingRaw.includes('hardback'))                  format = 'hardcover';
+
+    // Goodreads dates: "2023/04/15" → "2023-04-15"
+    const grDate = s => s ? s.replace(/\//g, '-') : null;
+
+    const pages  = parseInt(get('Number of Pages'), 10) || null;
+    const review = get('My Review').trim();
+
+    return {
+      title,
+      author:        get('Author'),
+      isbn,
+      format,
+      status,
+      total_pages:   pages,
+      current_page:  status === 'finished' ? (pages || 0) : 0,
+      progress_unit: 'pages',
+      added_date:    grDate(get('Date Added')),
+      finished_date: grDate(get('Date Read')),
+      body:          review,
+    };
   }
 
   function showMsg(text, type) {

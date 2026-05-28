@@ -121,13 +121,13 @@ const Store = (() => {
       cover:         'cover.jpg',
       cover_thumb:   `books/${slug}/cover-thumb.jpg`,
       started_date:  fields.status === 'reading'  ? today : (fields.started_date || null),
-      finished_date: fields.status === 'finished' ? today : null,
-      added_date:    today,
+      finished_date: fields.status === 'finished' ? (fields.finished_date || today) : null,
+      added_date:    fields.added_date || today,
       updated_date:  today,
       highlights:    [],
     };
 
-    const notesContent = serializeNotes(meta, '');
+    const notesContent = serializeNotes(meta, fields.body || '');
 
     // Write notes.md first (creates the "folder" implicitly)
     await GitHub.putFile(
