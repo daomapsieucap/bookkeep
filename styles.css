@@ -3,7 +3,7 @@
 
 /* Active nav state */
 .nav-btn { color: #a8a29e; transition: color 0.15s; }
-.nav-btn.active { color: #f59e0b; }
+.nav-btn.active { color: #ca8a04; }
 .nav-btn:hover { color: #78716c; }
 
 /* Book cover aspect ratio */
@@ -16,7 +16,7 @@
 /* Cover placeholder */
 .cover-placeholder {
   aspect-ratio: 2/3;
-  background: linear-gradient(135deg, #d6d3d1 0%, #a8a29e 100%);
+  background: linear-gradient(135deg, #fef9c3 0%, #fde047 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -31,7 +31,7 @@
 }
 .progress-bar-fill {
   height: 100%;
-  background: #f59e0b;
+  background: #facc15;
   border-radius: 9999px;
   transition: width 0.3s ease;
 }
@@ -50,7 +50,7 @@
 .prose-notes ul, .prose-notes ol { padding-left: 1.25em; margin-bottom: 0.75em; color: #44403c; }
 .prose-notes li { margin-bottom: 0.25em; }
 .prose-notes blockquote {
-  border-left: 3px solid #f59e0b;
+  border-left: 3px solid #facc15;
   padding-left: 0.875em;
   color: #78716c;
   font-style: italic;
@@ -70,7 +70,7 @@
   margin-bottom: 0.75em;
 }
 .prose-notes pre code { background: none; padding: 0; }
-.prose-notes a { color: #d97706; text-decoration: underline; }
+.prose-notes a { color: #ca8a04; text-decoration: underline; }
 .prose-notes hr { border-color: #e7e5e4; margin: 1em 0; }
 
 /* Segmented control */
@@ -205,7 +205,7 @@
   transition: border-color 0.15s;
   -webkit-appearance: none;
 }
-.form-input:focus { border-color: #f59e0b; box-shadow: 0 0 0 3px rgba(245,158,11,0.15); }
+.form-input:focus { border-color: #facc15; box-shadow: 0 0 0 3px rgba(250,204,21,0.2); }
 .form-label {
   display: block;
   font-size: 0.875rem;
@@ -231,15 +231,15 @@
 .toast.show { opacity: 1; transform: translateY(0); }
 .toast.success { background: #1c1917; color: white; }
 .toast.error { background: #dc2626; color: white; }
-.toast.warn { background: #d97706; color: white; }
+.toast.warn { background: #ca8a04; color: white; }
 
 /* Connection warning banner */
 #conn-warn {
   display: none;
-  background: #fef3c7;
-  border-bottom: 1px solid #fde68a;
+  background: #fef9c3;
+  border-bottom: 1px solid #fef08a;
   padding: 8px 16px;
   font-size: 0.8rem;
   text-align: center;
-  color: #92400e;
+  color: #713f12;
 }

@@ -22,7 +22,7 @@ const ShelfScreen = (() => {
       <div class="flex items-center justify-between px-4 pt-5 pb-2">
         <h1 class="text-2xl font-bold text-stone-900">My Shelf</h1>
         <button id="shelf-add-btn"
-          class="w-9 h-9 rounded-full bg-amber-500 text-white flex items-center justify-center shadow-sm active:opacity-80">
+          class="w-9 h-9 rounded-full bg-yellow-400 text-stone-900 flex items-center justify-center shadow-sm active:opacity-80">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
           </svg>
@@ -33,12 +33,12 @@ const ShelfScreen = (() => {
       <div id="conn-warn" class="mx-4 mb-2 rounded-lg text-sm px-3 py-2"></div>
 
       <!-- Tabs -->
-      <div class="flex border-b border-stone-200 px-4 gap-1 overflow-x-auto no-scrollbar">
+      <div class="flex border-b border-yellow-200 px-4 gap-1 overflow-x-auto no-scrollbar">
         ${TABS.map(t => `
           <button data-tab="${t.key}"
             class="tab-btn shrink-0 px-3 py-2 text-sm font-medium border-b-2 transition-colors
               ${_activeTab === t.key
-                ? 'border-amber-500 text-amber-600'
+                ? 'border-yellow-400 text-yellow-700'
                 : 'border-transparent text-stone-500 hover:text-stone-700'}">
             ${t.label}
           </button>

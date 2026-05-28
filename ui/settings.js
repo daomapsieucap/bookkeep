@@ -13,9 +13,10 @@ const SettingsScreen = (() => {
 
   function render(pat, owner, repo) {
     document.getElementById('screen').innerHTML = `
-      <div class="px-4 pt-5 pb-2">
+      <div class="px-4 pt-8 pb-2">
+        <p class="text-xs font-semibold text-yellow-600 uppercase tracking-widest mb-1">Bookkeep</p>
         <h1 class="text-2xl font-bold text-stone-900">Settings</h1>
-        <p class="text-sm text-stone-500 mt-1">Connect your private data repo.</p>
+        <p class="text-sm text-stone-500 mt-1">Connect your private GitHub data repo to get started.</p>
       </div>
 
       <div class="px-4 pb-8 space-y-6">
@@ -60,7 +61,7 @@ const SettingsScreen = (() => {
           <div id="validation-msg" class="hidden rounded-lg px-3 py-2 text-sm font-medium"></div>
 
           <button id="save-settings-btn"
-            class="w-full py-3 rounded-xl bg-amber-500 text-white font-semibold active:opacity-80 flex items-center justify-center gap-2">
+            class="w-full py-3 rounded-xl bg-yellow-400 text-stone-900 font-bold active:opacity-80 flex items-center justify-center gap-2">
             Save &amp; Validate
           </button>
         </div>
@@ -83,7 +84,7 @@ const SettingsScreen = (() => {
         <!-- About -->
         <div class="bg-white rounded-2xl shadow-sm p-4 space-y-1">
           <h2 class="font-semibold text-stone-700 text-sm uppercase tracking-wide mb-2">About</h2>
-          <p class="text-sm text-stone-500">Bookkeep — personal reading tracker.</p>
+          <p class="text-sm text-stone-500">Bookkeep: personal reading tracker.</p>
           <p class="text-xs text-stone-400 mt-1">
             Data lives in your private GitHub repo. This app has no server.
           </p>
@@ -120,7 +121,7 @@ const SettingsScreen = (() => {
     _saving = true;
     const btn = document.getElementById('save-settings-btn');
     btn.disabled = true;
-    btn.innerHTML = `<div class="spinner" style="border-color:rgba(255,255,255,0.3);border-top-color:white;width:18px;height:18px"></div> Validating…`;
+    btn.innerHTML = `<div class="spinner" style="border-color:rgba(26,26,26,0.2);border-top-color:#1c1917;width:18px;height:18px"></div> Validating…`;
     showMsg('', '');
 
     try {
@@ -164,7 +165,7 @@ const SettingsScreen = (() => {
         progressEl.textContent = msg;
       });
       Toast.success(`Rebuilt index: ${count} books.`);
-      progressEl.textContent = `Done — ${count} books indexed.`;
+      progressEl.textContent = `Done. ${count} books indexed.`;
     } catch (e) {
       Toast.error('Rebuild failed: ' + e.message);
       progressEl.textContent = 'Error: ' + e.message;
