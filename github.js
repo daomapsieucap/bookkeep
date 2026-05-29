@@ -33,7 +33,10 @@ const GitHub = (() => {
     if (res.status === 404) return null;
     if (!res.ok) throw new Error(`GitHub GET ${path}: ${res.status} ${await res.text()}`);
     const data = await res.json();
-    const content = atob(data.content.replace(/\n/g, ''));
+    const raw = atob(data.content.replace(/\n/g, ''));
+    const content = new TextDecoder('utf-8').decode(
+      Uint8Array.from(raw, c => c.charCodeAt(0))
+    );
     return { content, sha: data.sha };
   }
 
