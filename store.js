@@ -17,8 +17,9 @@ const Store = (() => {
       .slice(0, 40);
   }
 
-  function makeSlug(title) {
+  function makeSlug(title, existingSlugs = []) {
     const base = toSlug(title);
+    if (!existingSlugs.includes(base)) return base;
     const hash = Math.random().toString(36).slice(2, 6);
     return `${base}-${hash}`;
   }
@@ -106,7 +107,8 @@ const Store = (() => {
    */
   async function addBook(fields) {
     const today = new Date().toISOString().slice(0, 10);
-    const slug  = makeSlug(fields.title);
+    const { index, sha } = await fetchIndex();
+    const slug  = makeSlug(fields.title, index.books.map(b => b.slug));
 
     const meta = {
       slug,
@@ -140,7 +142,6 @@ const Store = (() => {
     // Build index entry (subset of meta, no highlights)
     const indexEntry = buildIndexEntry(meta);
 
-    const { index, sha } = await fetchIndex();
     index.books.push(indexEntry);
     await saveIndex(index, sha);
 
