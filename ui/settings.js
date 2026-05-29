@@ -255,8 +255,13 @@ const SettingsScreen = (() => {
       const fields = mapGoodreadsRow(headers, dataRows[i]);
       if (!fields) { failed++; continue; }
       try {
-        await Store.addBook(fields);
+        const slug = await Store.addBook(fields);
         imported++;
+        if (fields.isbn) {
+          progress.textContent = `Importing ${i + 1} / ${total} — fetching cover…`;
+          const coverFile = await fetchOpenLibraryCover(fields.isbn);
+          if (coverFile) await Images.uploadCover(coverFile, slug);
+        }
       } catch (e) {
         console.warn('Failed to import:', fields.title, e);
         failed++;
@@ -338,6 +343,19 @@ const SettingsScreen = (() => {
       finished_date: grDate(get('Date Read')),
       body:          review,
     };
+  }
+
+  async function fetchOpenLibraryCover(isbn) {
+    try {
+      const res = await fetch(`https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg`);
+      if (!res.ok) return null;
+      const blob = await res.blob();
+      // Open Library returns a tiny GIF/PNG placeholder when no cover exists
+      if (blob.size < 5000 || !blob.type.includes('jpeg')) return null;
+      return new File([blob], 'cover.jpg', { type: 'image/jpeg' });
+    } catch {
+      return null;
+    }
   }
 
   function showMsg(text, type) {
