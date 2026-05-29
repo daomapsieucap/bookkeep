@@ -3,10 +3,11 @@
  */
 
 const SettingsScreen = (() => {
-  let _saving     = false;
-  let _rebuilding = false;
-  let _importing  = false;
-  let _grFile     = null;
+  let _saving      = false;
+  let _rebuilding  = false;
+  let _importing   = false;
+  let _deduping    = false;
+  let _grFile      = null;
 
   function mount() {
     const { pat, owner, repo } = GitHub.cfg();
@@ -81,6 +82,15 @@ const SettingsScreen = (() => {
             class="w-full py-3 rounded-xl border border-stone-300 text-stone-600 font-medium text-sm active:opacity-60 flex items-center justify-center gap-2">
             Rebuild books.json from notes
           </button>
+          <p class="text-sm text-stone-500 pt-1">
+            Finds books with the same ISBN or title&nbsp;+&nbsp;author and removes the duplicates,
+            keeping the copy with the most complete data.
+          </p>
+          <div id="dedup-progress" class="hidden text-sm text-stone-500 italic"></div>
+          <button id="dedup-btn"
+            class="w-full py-3 rounded-xl border border-stone-300 text-stone-600 font-medium text-sm active:opacity-60 flex items-center justify-center gap-2">
+            Remove Duplicate Books
+          </button>
         </div>
 
         <!-- Goodreads import -->
@@ -130,6 +140,7 @@ const SettingsScreen = (() => {
 
     document.getElementById('save-settings-btn').addEventListener('click', handleSave);
     document.getElementById('rebuild-btn').addEventListener('click', handleRebuild);
+    document.getElementById('dedup-btn').addEventListener('click', handleDeduplicate);
 
     document.getElementById('gr-file-input').addEventListener('change', e => {
       _grFile = e.target.files[0] || null;
@@ -214,6 +225,84 @@ const SettingsScreen = (() => {
       _rebuilding = false;
       btn.disabled = false;
     }
+  }
+
+  async function handleDeduplicate() {
+    if (_deduping) return;
+    if (!GitHub.isConfigured()) {
+      Toast.error('Configure and save your settings first.');
+      return;
+    }
+
+    _deduping = true;
+    const btn        = document.getElementById('dedup-btn');
+    const progressEl = document.getElementById('dedup-progress');
+    btn.disabled = true;
+    progressEl.classList.remove('hidden');
+    progressEl.textContent = 'Scanning library…';
+
+    try {
+      const books = await Store.listBooks();
+
+      // Group by ISBN (preferred) or normalised title+author
+      const groups = new Map();
+      for (const book of books) {
+        const key = (book.isbn && book.isbn.trim())
+          ? `isbn:${book.isbn.trim()}`
+          : `ta:${book.title.toLowerCase().trim()}|${(book.author || '').toLowerCase().trim()}`;
+        if (!groups.has(key)) groups.set(key, []);
+        groups.get(key).push(book);
+      }
+
+      const dupeGroups = [...groups.values()].filter(g => g.length > 1);
+
+      if (!dupeGroups.length) {
+        progressEl.textContent = 'No duplicates found.';
+        Toast.success('No duplicates found.');
+        return;
+      }
+
+      const totalDupes = dupeGroups.reduce((n, g) => n + g.length - 1, 0);
+      if (!confirm(`Found ${totalDupes} duplicate book${totalDupes !== 1 ? 's' : ''} across ${dupeGroups.length} group${dupeGroups.length !== 1 ? 's' : ''}. Delete the duplicates now?`)) {
+        progressEl.textContent = '';
+        progressEl.classList.add('hidden');
+        return;
+      }
+
+      let deleted = 0;
+      for (let i = 0; i < dupeGroups.length; i++) {
+        const group = dupeGroups[i];
+        const keeper = group.reduce((best, b) => scoreBook(b) >= scoreBook(best) ? b : best);
+        const toDelete = group.filter(b => b.slug !== keeper.slug);
+        for (const book of toDelete) {
+          progressEl.textContent = `Removing duplicate: "${book.title}" (${deleted + 1} / ${totalDupes})…`;
+          await Store.deleteBook(book.slug);
+          deleted++;
+        }
+      }
+
+      Store.invalidateIndex();
+      progressEl.textContent = `Done. Removed ${deleted} duplicate${deleted !== 1 ? 's' : ''}.`;
+      Toast.success(`Removed ${deleted} duplicate book${deleted !== 1 ? 's' : ''}.`);
+    } catch (e) {
+      Toast.error('Deduplicate failed: ' + e.message);
+      progressEl.textContent = 'Error: ' + e.message;
+    } finally {
+      _deduping    = false;
+      btn.disabled = false;
+    }
+  }
+
+  function scoreBook(b) {
+    let score = 0;
+    if (b.isbn && b.isbn.trim())      score += 3;
+    if (b.status === 'finished')      score += 2;
+    else if (b.status === 'reading')  score += 1;
+    if (b.finished_date)              score += 1;
+    if (b.started_date)               score += 1;
+    // Earlier added_date as a tiebreaker (lexicographic ISO comparison)
+    if (b.added_date)                 score += 0.5 / (new Date(b.added_date).getTime() || Infinity) * 1e12;
+    return score;
   }
 
   async function handleGoodreadsImport() {
