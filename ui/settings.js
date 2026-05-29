@@ -248,19 +248,41 @@ const SettingsScreen = (() => {
     progress.classList.remove('hidden');
 
     let imported = 0;
+    let skipped  = 0;
+    let covered  = 0;
     let failed   = 0;
+
+    progress.textContent = 'Loading existing library…';
+    const existingBooks = await Store.listBooks();
 
     for (let i = 0; i < dataRows.length; i++) {
       progress.textContent = `Importing ${i + 1} / ${total}…`;
       const fields = mapGoodreadsRow(headers, dataRows[i]);
       if (!fields) { failed++; continue; }
+
+      // Deduplicate: match by ISBN, then fall back to title+author
+      const existing = findExisting(existingBooks, fields);
+
       try {
-        const slug = await Store.addBook(fields);
-        imported++;
-        if (fields.isbn) {
-          progress.textContent = `Importing ${i + 1} / ${total} — fetching cover…`;
-          const coverFile = await fetchOpenLibraryCover(fields.isbn);
-          if (coverFile) await Images.uploadCover(coverFile, slug);
+        if (existing) {
+          // Book already in library — only fix a missing cover
+          const coverPath = `books/${existing.slug}/cover.jpg`;
+          const existingSha = await GitHub.getSha(coverPath);
+          if (!existingSha && fields.isbn) {
+            progress.textContent = `${i + 1} / ${total} — fixing cover for "${existing.title}"…`;
+            const coverFile = await fetchOpenLibraryCover(fields.isbn);
+            if (coverFile) { await Images.uploadCover(coverFile, existing.slug); covered++; }
+          }
+          skipped++;
+        } else {
+          const slug = await Store.addBook(fields);
+          imported++;
+          existingBooks.push({ slug, title: fields.title, author: fields.author || '', isbn: fields.isbn || '' });
+          if (fields.isbn) {
+            progress.textContent = `${i + 1} / ${total} — fetching cover…`;
+            const coverFile = await fetchOpenLibraryCover(fields.isbn);
+            if (coverFile) { await Images.uploadCover(coverFile, slug); covered++; }
+          }
         }
       } catch (e) {
         console.warn('Failed to import:', fields.title, e);
@@ -275,7 +297,8 @@ const SettingsScreen = (() => {
     btn.classList.add('hidden');
     document.getElementById('gr-file-name').textContent = 'Choose CSV file…';
     document.getElementById('gr-file-input').value = '';
-    progress.textContent = `Done. ${imported} imported${failed ? `, ${failed} failed` : ''}.`;
+    const parts = [`${imported} imported`, skipped ? `${skipped} already existed` : '', covered ? `${covered} covers added` : '', failed ? `${failed} failed` : ''].filter(Boolean);
+    progress.textContent = `Done. ${parts.join(', ')}.`;
     Toast.success(`Imported ${imported} book${imported !== 1 ? 's' : ''} from Goodreads.`);
   }
 
@@ -343,6 +366,16 @@ const SettingsScreen = (() => {
       finished_date: grDate(get('Date Read')),
       body:          review,
     };
+  }
+
+  function findExisting(books, fields) {
+    if (fields.isbn) {
+      const byIsbn = books.find(b => b.isbn && b.isbn === fields.isbn);
+      if (byIsbn) return byIsbn;
+    }
+    const t = fields.title.toLowerCase();
+    const a = (fields.author || '').toLowerCase();
+    return books.find(b => b.title.toLowerCase() === t && (b.author || '').toLowerCase() === a) || null;
   }
 
   async function fetchOpenLibraryCover(isbn) {
