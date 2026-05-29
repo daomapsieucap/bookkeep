@@ -61,6 +61,14 @@ const ShelfScreen = (() => {
     });
 
     Toast.updateConnBanner();
+
+    if (!_loading) {
+      document.querySelectorAll('.book-card').forEach(card => {
+        card.addEventListener('click', () => App.navigate(`/book/${card.dataset.slug}`));
+      });
+      loadVisibleImages();
+      document.getElementById('book-list')?.addEventListener('scroll', loadVisibleImages);
+    }
   }
 
   function renderLoading() {
@@ -194,15 +202,6 @@ const ShelfScreen = (() => {
 
     _loading = false;
     render();
-
-    // Bind card clicks
-    document.querySelectorAll('.book-card').forEach(card => {
-      card.addEventListener('click', () => App.navigate(`/book/${card.dataset.slug}`));
-    });
-
-    // Load thumbnails
-    loadVisibleImages();
-    document.getElementById('book-list')?.addEventListener('scroll', loadVisibleImages);
   }
 
   return { mount };
