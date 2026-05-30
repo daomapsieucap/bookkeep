@@ -13,39 +13,33 @@ const Images = (() => {
   /** Resize + compress a File to a JPEG Blob via Canvas. */
   function compressToJpeg(file, maxPx, quality) {
     return new Promise((resolve, reject) => {
-      const url = URL.createObjectURL(file);
-      const img  = new Image();
+      createImageBitmap(file)
+        .then(bmp => {
+          let w = bmp.width;
+          let h = bmp.height;
+          if (w > maxPx || h > maxPx) {
+            if (w >= h) { h = Math.round((h / w) * maxPx); w = maxPx; }
+            else        { w = Math.round((w / h) * maxPx); h = maxPx; }
+          }
 
-      img.onload = () => {
-        URL.revokeObjectURL(url);
+          const canvas = document.createElement('canvas');
+          canvas.width  = w;
+          canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          if (!ctx) { bmp.close(); reject(new Error('Canvas 2D not available')); return; }
+          ctx.drawImage(bmp, 0, 0, w, h);
+          bmp.close();
 
-        let w = img.naturalWidth;
-        let h = img.naturalHeight;
-        if (w > maxPx || h > maxPx) {
-          if (w >= h) { h = Math.round((h / w) * maxPx); w = maxPx; }
-          else        { w = Math.round((w / h) * maxPx); h = maxPx; }
-        }
-
-        const canvas = document.createElement('canvas');
-        canvas.width  = w;
-        canvas.height = h;
-        const ctx = canvas.getContext('2d');
-        if (!ctx) { reject(new Error('Canvas 2D not available')); return; }
-        ctx.drawImage(img, 0, 0, w, h);
-
-        canvas.toBlob(
-          blob => blob ? resolve(blob) : reject(new Error('Canvas toBlob returned null')),
-          'image/jpeg',
-          quality,
-        );
-      };
-
-      img.onerror = () => {
-        URL.revokeObjectURL(url);
-        reject(new Error('Failed to decode image'));
-      };
-
-      img.src = url;
+          canvas.toBlob(
+            blob => blob ? resolve(blob) : reject(new Error('Canvas toBlob returned null')),
+            'image/jpeg',
+            quality,
+          );
+        })
+        .catch(e => reject(new Error(
+          `Failed to decode image (${file.type || 'unknown type'}, ${Math.round(file.size / 1024)} KB): `
+          + (e?.message || String(e))
+        )));
     });
   }
 
