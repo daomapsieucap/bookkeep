@@ -55,7 +55,11 @@ const GitHub = (() => {
       headers: headers({ 'Content-Type': 'application/json' }),
       body: JSON.stringify(body),
     });
-    if (!res.ok) throw new Error(`GitHub PUT ${path}: ${res.status} ${await res.text()}`);
+    if (!res.ok) {
+      if (res.status === 401) throw new Error('GitHub token is invalid or expired — update it in Settings.');
+      if (res.status === 403) throw new Error('GitHub token lacks write permission — update it in Settings.');
+      throw new Error(`GitHub PUT ${path}: ${res.status} ${await res.text()}`);
+    }
     const data = await res.json();
     return data.content.sha;
   }
@@ -90,7 +94,11 @@ const GitHub = (() => {
       headers: headers({ 'Content-Type': 'application/json' }),
       body: JSON.stringify({ message: message || `Delete ${path}`, sha }),
     });
-    if (!res.ok) throw new Error(`GitHub DELETE ${path}: ${res.status} ${await res.text()}`);
+    if (!res.ok) {
+      if (res.status === 401) throw new Error('GitHub token is invalid or expired — update it in Settings.');
+      if (res.status === 403) throw new Error('GitHub token lacks write permission — update it in Settings.');
+      throw new Error(`GitHub DELETE ${path}: ${res.status} ${await res.text()}`);
+    }
   }
 
   /** List directory contents — returns array of { name, path, sha, type } */
@@ -110,6 +118,8 @@ const GitHub = (() => {
       headers: { ...headers(), 'Accept': 'application/vnd.github.object+json' },
     });
     if (res.status === 404) return null;
+    if (res.status === 401) throw new Error('GitHub token is invalid or expired — update it in Settings.');
+    if (res.status === 403) throw new Error('GitHub token lacks write permission — update it in Settings.');
     if (!res.ok) throw new Error(`GitHub HEAD ${path}: ${res.status}`);
     const data = await res.json();
     return data.sha;
