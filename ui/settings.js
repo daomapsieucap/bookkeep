@@ -432,9 +432,8 @@ const SettingsScreen = (() => {
     const status    = shelfMap[get('Exclusive Shelf')] || 'want-to-read';
 
     const bindingRaw = get('Binding').toLowerCase();
-    let format = 'paper';
+    let format = 'paperback';
     if (bindingRaw.includes('kindle') || bindingRaw.includes('ebook') || bindingRaw === 'digital') format = 'ebook';
-    else if (bindingRaw.includes('hardcover') || bindingRaw.includes('hardback'))                  format = 'hardcover';
 
     // Goodreads dates: "2023/04/15" → "2023-04-15"
     const grDate = s => s ? s.replace(/\//g, '-') : null;

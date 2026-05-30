@@ -712,8 +712,8 @@ const BookDetailScreen = (() => {
   }
 
   function formatBadge(format) {
-    if (!format || format === 'paper') return '';
-    const label = { kindle: 'Kindle', ebook: 'eBook' }[format] || format;
+    if (!format || format === 'paperback') return '';
+    const label = { ebook: 'eBook' }[format] || format;
     return `<span class="text-xs font-medium px-2 py-0.5 rounded-full bg-stone-100 text-stone-500">${label}</span>`;
   }
 

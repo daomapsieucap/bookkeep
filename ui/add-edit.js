@@ -38,6 +38,12 @@ const AddEditScreen = (() => {
     render();
   }
 
+  function normFmt(f) {
+    if (!f || f === 'paper' || f === 'hardcover') return 'paperback';
+    if (f === 'kindle') return 'ebook';
+    return f;
+  }
+
   // ── Render ────────────────────────────────────────────────────────────────
 
   function renderLoading() {
@@ -50,9 +56,9 @@ const AddEditScreen = (() => {
   function render() {
     const isEdit  = !!_slug;
     const b       = _book || {};
-    const fmt     = b.format        || 'paper';
+    const fmt     = normFmt(b.format);
     const status  = b.status        || 'want-to-read';
-    const pUnit   = b.progress_unit || (fmt === 'paper' ? 'pages' : 'percent');
+    const pUnit   = b.progress_unit || (fmt === 'paperback' ? 'pages' : 'percent');
 
     document.getElementById('screen').innerHTML = `
       <div class="flex items-center gap-3 px-4 pt-5 pb-2">
@@ -125,9 +131,9 @@ const AddEditScreen = (() => {
         <div>
           <label class="form-label">Format</label>
           <div class="seg-control" id="fmt-control">
-            ${['paper','kindle','ebook'].map(f => `
+            ${[['paperback','Paperback'],['ebook','eBook']].map(([f,l]) => `
               <div class="seg-btn ${fmt === f ? 'active' : ''}" data-val="${f}">
-                ${f === 'paper' ? 'Paper' : f === 'kindle' ? 'Kindle' : 'eBook'}
+                ${l}
               </div>`).join('')}
           </div>
         </div>
@@ -268,7 +274,7 @@ const AddEditScreen = (() => {
   }
 
   function getCurrentFormat() {
-    return document.querySelector('#fmt-control .seg-btn.active')?.dataset.val || 'paper';
+    return document.querySelector('#fmt-control .seg-btn.active')?.dataset.val || 'paperback';
   }
   function getCurrentStatus() {
     return document.querySelector('#status-control .seg-btn.active')?.dataset.val || 'want-to-read';
@@ -276,7 +282,7 @@ const AddEditScreen = (() => {
   function getCurrentUnit() {
     const fmt = getCurrentFormat();
     const hasToggle = document.getElementById('toggle-unit-btn');
-    if (!hasToggle) return fmt === 'paper' ? 'pages' : 'percent';
+    if (!hasToggle) return fmt === 'paperback' ? 'pages' : 'percent';
     // If toggle exists, read current state from presence of #f-total
     return document.getElementById('f-total') ? 'pages' : 'percent';
   }
@@ -292,7 +298,7 @@ const AddEditScreen = (() => {
   function refreshProgressSection() {
     const fmt    = getCurrentFormat();
     const status = getCurrentStatus();
-    const pUnit = _unitOverride || (fmt === 'paper' ? 'pages' : 'percent');
+    const pUnit = _unitOverride || (fmt === 'paperback' ? 'pages' : 'percent');
 
     const partial = {
       current_page: parseInt(document.getElementById('f-current')?.value) || 0,

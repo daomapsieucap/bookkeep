@@ -27,6 +27,14 @@ const Store = (() => {
     return `${base}-${hash}`;
   }
 
+  // ── Format normalization ─────────────────────────────────────────────────
+
+  function normFmt(f) {
+    if (!f || f === 'paper' || f === 'hardcover') return 'paperback';
+    if (f === 'kindle') return 'ebook';
+    return f;
+  }
+
   // ── Frontmatter helpers ──────────────────────────────────────────────────
 
   const NOTES_FENCE = '---';
@@ -118,7 +126,7 @@ const Store = (() => {
       title:         fields.title,
       author:        fields.author        || '',
       isbn:          fields.isbn          || '',
-      format:        fields.format        || 'paper',
+      format:        normFmt(fields.format),
       status:        fields.status        || 'want-to-read',
       progress_unit: fields.progress_unit || 'pages',
       total_pages:   fields.total_pages   || null,
@@ -358,7 +366,7 @@ const Store = (() => {
       title:         meta.title,
       author:        meta.author        || '',
       isbn:          meta.isbn          || '',
-      format:        meta.format        || 'paper',
+      format:        normFmt(meta.format),
       status:        meta.status        || 'want-to-read',
       progress_unit: meta.progress_unit || 'pages',
       total_pages:   meta.total_pages   || null,

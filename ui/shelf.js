@@ -131,7 +131,7 @@ const ShelfScreen = (() => {
 
   function renderCard(book) {
     const pct = calcPercent(book);
-    const formatBadge = book.format && book.format !== 'paper'
+    const formatBadge = book.format && book.format !== 'paperback'
       ? `<span class="text-xs bg-stone-100 text-stone-500 rounded px-1.5 py-0.5 font-medium">${fmtFormat(book.format)}</span>`
       : '';
 
@@ -167,7 +167,7 @@ const ShelfScreen = (() => {
   }
 
   function fmtFormat(f) {
-    return { paper: 'Paper', kindle: 'Kindle', ebook: 'eBook' }[f] || f;
+    return { paperback: 'Paperback', ebook: 'eBook' }[f] || f;
   }
 
   function progressLabel(book) {
