@@ -522,11 +522,21 @@ const BookDetailScreen = (() => {
       });
 
     } catch (e) {
+      console.error('[highlight upload] raw error:', e);
+      console.error('[highlight upload] type:', Object.prototype.toString.call(e));
+      if (e instanceof Event) {
+        console.error('[highlight upload] event.type:', e.type, '| target.error:', e.target?.error);
+      }
+      const msg = e instanceof Error
+        ? e.message
+        : e instanceof Event
+          ? `${e.type}${e.target?.error ? ': ' + e.target.error.message : ''}`
+          : String(e);
       placeholder.innerHTML = `
         <div class="highlight-thumb-wrap bg-red-50 flex items-center justify-center">
           <span class="text-xs text-red-400 p-2 text-center">Upload failed</span>
         </div>`;
-      Toast.error('Upload failed: ' + (e?.message || String(e) || 'unknown error'));
+      Toast.error('Upload failed: ' + msg);
     }
   }
 
