@@ -31,6 +31,8 @@ const GitHub = (() => {
   async function getFile(path) {
     const res = await fetch(`${base()}/${path}`, { headers: headers() });
     if (res.status === 404) return null;
+    if (res.status === 401) throw new Error('GitHub token is invalid or expired — update it in Settings.');
+    if (res.status === 403) throw new Error('GitHub token lacks write permission — update it in Settings.');
     if (!res.ok) throw new Error(`GitHub GET ${path}: ${res.status} ${await res.text()}`);
     const data = await res.json();
     const raw = atob(data.content.replace(/\n/g, ''));
@@ -114,9 +116,7 @@ const GitHub = (() => {
    * Returns null if not found.
    */
   async function getSha(path) {
-    const res = await fetch(`${base()}/${path}`, {
-      headers: { ...headers(), 'Accept': 'application/vnd.github.object+json' },
-    });
+    const res = await fetch(`${base()}/${path}`, { headers: headers() });
     if (res.status === 404) return null;
     if (res.status === 401) throw new Error('GitHub token is invalid or expired — update it in Settings.');
     if (res.status === 403) throw new Error('GitHub token lacks write permission — update it in Settings.');
