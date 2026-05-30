@@ -51,7 +51,7 @@ const BookDetailScreen = (() => {
   function renderLoading() {
     document.getElementById('screen').innerHTML = `
       <div class="flex items-center justify-center h-64">
-        <div class="spinner" style="border-color:rgba(250,204,21,0.3);border-top-color:#facc15"></div>
+        <div class="spinner" style="border-color:rgba(120,113,108,0.3);border-top-color:#78716c"></div>
       </div>`;
   }
 
@@ -69,7 +69,7 @@ const BookDetailScreen = (() => {
         </button>
         <h1 class="text-lg font-bold text-stone-900 truncate flex-1">${esc(m.title)}</h1>
         <button id="edit-btn"
-          class="text-sm text-yellow-700 font-medium active:opacity-60 shrink-0">Edit</button>
+          class="text-sm text-stone-500 font-medium active:opacity-60 shrink-0">Edit</button>
       </div>
 
       <!-- Book info card -->
@@ -77,7 +77,7 @@ const BookDetailScreen = (() => {
         <div class="w-24 shrink-0 rounded-lg overflow-hidden shadow-sm">
           <div id="cover-wrap">
             <div class="cover-placeholder w-full" style="min-height:9rem">
-              <div class="spinner" style="border-color:rgba(250,204,21,0.3);border-top-color:#facc15;width:24px;height:24px"></div>
+              <div class="spinner" style="border-color:rgba(120,113,108,0.3);border-top-color:#78716c;width:24px;height:24px"></div>
             </div>
           </div>
         </div>
@@ -104,7 +104,7 @@ const BookDetailScreen = (() => {
       <div class="mx-4 mb-4">
         <div class="flex items-center justify-between mb-2">
           <h3 class="font-semibold text-stone-700 text-sm uppercase tracking-wide">Notes</h3>
-          <button id="toggle-notes-edit" class="text-sm text-yellow-700 font-medium active:opacity-60">
+          <button id="toggle-notes-edit" class="text-sm text-stone-500 font-medium active:opacity-60">
             ${_editingNotes ? 'Preview' : 'Edit'}
           </button>
         </div>
@@ -120,7 +120,7 @@ const BookDetailScreen = (() => {
         </div>
         <div class="flex gap-2 mb-3">
           <button type="button" id="hl-camera-btn"
-            class="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border-2 border-dashed border-blue-200 text-blue-500 text-sm font-medium active:opacity-60">
+            class="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border-2 border-dashed border-stone-300 text-stone-500 text-sm font-medium active:opacity-60">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
@@ -129,7 +129,7 @@ const BookDetailScreen = (() => {
             Camera
           </button>
           <button type="button" id="hl-gallery-btn"
-            class="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border-2 border-dashed border-yellow-300 text-yellow-700 text-sm font-medium active:opacity-60">
+            class="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border-2 border-dashed border-stone-300 text-stone-500 text-sm font-medium active:opacity-60">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
@@ -158,7 +158,7 @@ const BookDetailScreen = (() => {
       <div class="mx-4 mb-4 bg-white rounded-2xl shadow-sm p-4">
         <div class="flex items-center justify-between mb-3">
           <h3 class="font-semibold text-stone-700 text-sm">Progress</h3>
-          <span id="pct-display" class="text-sm font-semibold text-yellow-700">${pct}%</span>
+          <span id="pct-display" class="text-sm font-semibold text-stone-600">${pct}%</span>
         </div>
         <div class="progress-bar-track mb-4">
           <div id="progress-fill" class="progress-bar-fill" style="width:${pct}%"></div>
@@ -194,7 +194,7 @@ const BookDetailScreen = (() => {
       return `
         <div class="mx-4 mb-4">
           <button id="start-reading-btn"
-            class="w-full py-3 rounded-xl bg-yellow-400 text-stone-900 font-bold active:opacity-80">
+            class="w-full py-3 rounded-xl bg-stone-800 text-white font-bold active:opacity-80">
             Start Reading
           </button>
         </div>`;
@@ -203,7 +203,7 @@ const BookDetailScreen = (() => {
       return `
         <div class="mx-4 mb-4">
           <button id="re-read-btn"
-            class="w-full py-3 rounded-xl border border-yellow-400 text-yellow-700 font-semibold text-sm active:opacity-60">
+            class="w-full py-3 rounded-xl border border-stone-300 text-stone-600 font-semibold text-sm active:opacity-60">
             Re-read
           </button>
         </div>`;
@@ -468,7 +468,7 @@ const BookDetailScreen = (() => {
     } catch { /* not critical */ }
 
     for (const file of files) {
-      const id = `h-${Date.now()}-${Math.random().toString(36).slice(2,5)}`;
+      const id = `${_slug}-h-${Date.now()}-${Math.random().toString(36).slice(2,5)}`;
       await uploadNewHighlight(file, id);
       // Small delay between sequential uploads
       if (files.indexOf(file) < files.length - 1) await sleep(200);
@@ -700,8 +700,8 @@ const BookDetailScreen = (() => {
 
   function statusBadge(status) {
     const map = {
-      'reading':      ['bg-yellow-100 text-yellow-800', 'Reading'],
-      'want-to-read': ['bg-blue-100 text-blue-700',     'Want to Read'],
+      'reading':      ['bg-stone-100 text-stone-600',  'Reading'],
+      'want-to-read': ['bg-slate-100 text-slate-600',  'Want to Read'],
       'finished':     ['bg-green-100 text-green-700',   'Finished'],
     };
     const [cls, label] = map[status] || ['bg-stone-100 text-stone-500', status];

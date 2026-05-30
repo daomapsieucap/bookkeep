@@ -43,7 +43,7 @@ const AddEditScreen = (() => {
   function renderLoading() {
     document.getElementById('screen').innerHTML = `
       <div class="flex items-center justify-center h-64">
-        <div class="spinner" style="border-color:rgba(250,204,21,0.3);border-top-color:#facc15"></div>
+        <div class="spinner" style="border-color:rgba(120,113,108,0.3);border-top-color:#78716c"></div>
       </div>`;
   }
 
@@ -75,7 +75,7 @@ const AddEditScreen = (() => {
             </div>
             <div class="flex flex-col gap-2 pt-1">
               <button type="button" id="cover-camera-btn"
-                class="flex items-center gap-2 text-sm font-medium text-yellow-700 active:opacity-60">
+                class="flex items-center gap-2 text-sm font-medium text-stone-500 active:opacity-60">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
@@ -84,7 +84,7 @@ const AddEditScreen = (() => {
                 Take Photo
               </button>
               <button type="button" id="cover-gallery-btn"
-                class="flex items-center gap-2 text-sm font-medium text-yellow-700 active:opacity-60">
+                class="flex items-center gap-2 text-sm font-medium text-stone-500 active:opacity-60">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
@@ -145,7 +145,7 @@ const AddEditScreen = (() => {
 
         <!-- Submit -->
         <button type="submit" id="submit-btn"
-          class="w-full py-3 rounded-xl bg-yellow-400 text-stone-900 font-bold text-base active:opacity-80 flex items-center justify-center gap-2">
+          class="w-full py-3 rounded-xl bg-stone-800 text-white font-bold text-base active:opacity-80 flex items-center justify-center gap-2">
           ${isEdit ? 'Save Changes' : 'Add Book'}
         </button>
 
@@ -191,7 +191,7 @@ const AddEditScreen = (() => {
           </div>
           <div class="flex items-center gap-2 mt-2">
             <span class="text-sm text-stone-400">Tracking by percent</span>
-            <button type="button" id="toggle-unit-btn" class="text-xs text-yellow-700 underline">Switch to pages</button>
+            <button type="button" id="toggle-unit-btn" class="text-xs text-stone-500 underline">Switch to pages</button>
           </div>
         </div>`;
     }
@@ -209,7 +209,7 @@ const AddEditScreen = (() => {
         </div>
         ${getCurrentFormat() !== 'paper' ? `
           <div class="flex items-center gap-2 mt-2">
-            <button type="button" id="toggle-unit-btn" class="text-xs text-yellow-700 underline">Switch to percent</button>
+            <button type="button" id="toggle-unit-btn" class="text-xs text-stone-500 underline">Switch to percent</button>
           </div>` : ''}
       </div>`;
   }
@@ -335,7 +335,7 @@ const AddEditScreen = (() => {
     _saving = true;
     const btn = document.getElementById('submit-btn');
     btn.disabled = true;
-    btn.innerHTML = `<div class="spinner" style="border-color:rgba(26,26,26,0.2);border-top-color:#1c1917"></div> Saving…`;
+    btn.innerHTML = `<div class="spinner" style="border-color:rgba(255,255,255,0.3);border-top-color:white"></div> Saving…`;
 
     const fmt    = getCurrentFormat();
     const status = getCurrentStatus();
@@ -364,7 +364,7 @@ const AddEditScreen = (() => {
 
       // Upload cover if selected
       if (_coverFile) {
-        btn.innerHTML = `<div class="spinner" style="border-color:rgba(26,26,26,0.2);border-top-color:#1c1917"></div> Uploading cover…`;
+        btn.innerHTML = `<div class="spinner" style="border-color:rgba(255,255,255,0.3);border-top-color:white"></div> Uploading cover…`;
         const existingThumbSha = _book?.cover_thumb ? await GitHub.getSha(`books/${targetSlug}/cover-thumb.jpg`) : null;
         const existingDisplaySha = _book?.cover_thumb ? await GitHub.getSha(`books/${targetSlug}/cover.jpg`) : null;
         const { thumbPath } = await Images.uploadCover(

@@ -17,7 +17,7 @@ const SettingsScreen = (() => {
   function render(pat, owner, repo) {
     document.getElementById('screen').innerHTML = `
       <div class="px-4 pt-8 pb-2">
-        <p class="text-xs font-semibold text-blue-700 uppercase tracking-widest mb-1">Bookkeep</p>
+        <p class="text-xs font-semibold text-stone-400 uppercase tracking-widest mb-1">Bookkeep</p>
         <h1 class="text-2xl font-bold text-stone-900">Settings</h1>
         <p class="text-sm text-stone-500 mt-1">Connect your private GitHub data repo to get started.</p>
       </div>
@@ -64,7 +64,7 @@ const SettingsScreen = (() => {
           <div id="validation-msg" class="hidden rounded-lg px-3 py-2 text-sm font-medium"></div>
 
           <button id="save-settings-btn"
-            class="w-full py-3 rounded-xl bg-yellow-400 text-stone-900 font-bold active:opacity-80 flex items-center justify-center gap-2">
+            class="w-full py-3 rounded-xl bg-stone-800 text-white font-bold active:opacity-80 flex items-center justify-center gap-2">
             Save &amp; Validate
           </button>
         </div>
@@ -111,7 +111,7 @@ const SettingsScreen = (() => {
           </label>
           <div id="gr-progress" class="hidden text-sm text-stone-500 italic"></div>
           <button id="gr-import-btn"
-            class="hidden w-full py-3 rounded-xl bg-yellow-400 text-stone-900 font-bold active:opacity-80 flex items-center justify-center gap-2">
+            class="hidden w-full py-3 rounded-xl bg-stone-800 text-white font-bold active:opacity-80 flex items-center justify-center gap-2">
             Import
           </button>
         </div>
@@ -173,7 +173,7 @@ const SettingsScreen = (() => {
     _saving = true;
     const btn = document.getElementById('save-settings-btn');
     btn.disabled = true;
-    btn.innerHTML = `<div class="spinner" style="border-color:rgba(26,26,26,0.2);border-top-color:#1c1917;width:18px;height:18px"></div> Validating…`;
+    btn.innerHTML = `<div class="spinner" style="border-color:rgba(255,255,255,0.3);border-top-color:white;width:18px;height:18px"></div> Validating…`;
     showMsg('', '');
 
     try {
@@ -333,7 +333,7 @@ const SettingsScreen = (() => {
     const btn      = document.getElementById('gr-import-btn');
     const progress = document.getElementById('gr-progress');
     btn.disabled   = true;
-    btn.innerHTML  = `<div class="spinner" style="border-color:rgba(26,26,26,0.2);border-top-color:#1c1917;width:18px;height:18px"></div> Importing…`;
+    btn.innerHTML  = `<div class="spinner" style="border-color:rgba(255,255,255,0.3);border-top-color:white;width:18px;height:18px"></div> Importing…`;
     progress.classList.remove('hidden');
 
     let imported = 0;

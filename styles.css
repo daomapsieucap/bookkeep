@@ -3,7 +3,7 @@
 
 /* Active nav state */
 .nav-btn { color: rgba(191,219,254,0.75); transition: color 0.15s; }
-.nav-btn.active { color: #fde047; }
+.nav-btn.active { color: #c9a017; }
 .nav-btn:hover { color: #bfdbfe; }
 
 /* Book cover aspect ratio */
@@ -16,7 +16,7 @@
 /* Cover placeholder */
 .cover-placeholder {
   aspect-ratio: 2/3;
-  background: linear-gradient(135deg, #fef9c3 0%, #fde047 100%);
+  background: #ede9e3;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -31,7 +31,7 @@
 }
 .progress-bar-fill {
   height: 100%;
-  background: #facc15;
+  background: #c9a017;
   border-radius: 9999px;
   transition: width 0.3s ease;
 }
@@ -50,7 +50,7 @@
 .prose-notes ul, .prose-notes ol { padding-left: 1.25em; margin-bottom: 0.75em; color: #44403c; }
 .prose-notes li { margin-bottom: 0.25em; }
 .prose-notes blockquote {
-  border-left: 3px solid #facc15;
+  border-left: 3px solid #c9a017;
   padding-left: 0.875em;
   color: #78716c;
   font-style: italic;
@@ -70,7 +70,7 @@
   margin-bottom: 0.75em;
 }
 .prose-notes pre code { background: none; padding: 0; }
-.prose-notes a { color: #ca8a04; text-decoration: underline; }
+.prose-notes a { color: #78716c; text-decoration: underline; }
 .prose-notes hr { border-color: #e7e5e4; margin: 1em 0; }
 
 /* Segmented control */
@@ -205,7 +205,7 @@
   transition: border-color 0.15s;
   -webkit-appearance: none;
 }
-.form-input:focus { border-color: #facc15; box-shadow: 0 0 0 3px rgba(250,204,21,0.2); }
+.form-input:focus { border-color: #78716c; box-shadow: 0 0 0 3px rgba(120,113,108,0.15); }
 .form-label {
   display: block;
   font-size: 0.875rem;
@@ -231,15 +231,15 @@
 .toast.show { opacity: 1; transform: translateY(0); }
 .toast.success { background: #1c1917; color: white; }
 .toast.error { background: #dc2626; color: white; }
-.toast.warn { background: #ca8a04; color: white; }
+.toast.warn { background: #57534e; color: white; }
 
 /* Connection warning banner */
 #conn-warn {
   display: none;
-  background: #fef9c3;
-  border-bottom: 1px solid #fef08a;
+  background: #f5f5f4;
+  border-bottom: 1px solid #e7e5e4;
   padding: 8px 16px;
   font-size: 0.8rem;
   text-align: center;
-  color: #713f12;
+  color: #57534e;
 }
