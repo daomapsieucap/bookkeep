@@ -181,7 +181,7 @@ const AddEditScreen = (() => {
 
   function renderProgressFields(pUnit, b) {
     const status = getCurrentStatus();
-    if (status === 'want-to-read') return '';
+    if (status === 'want-to-read' || status === 'finished') return '';
 
     if (pUnit === 'percent') {
       return `
@@ -292,8 +292,7 @@ const AddEditScreen = (() => {
   function refreshProgressSection() {
     const fmt    = getCurrentFormat();
     const status = getCurrentStatus();
-    let pUnit    = _unitOverride || (fmt === 'paper' ? 'pages' : 'percent');
-    if (status === 'finished') pUnit = (_book?.progress_unit || pUnit);
+    const pUnit = _unitOverride || (fmt === 'paper' ? 'pages' : 'percent');
 
     const partial = {
       current_page: parseInt(document.getElementById('f-current')?.value) || 0,
@@ -344,6 +343,11 @@ const AddEditScreen = (() => {
     const status = getCurrentStatus();
     const pUnit  = _unitOverride || (fmt === 'paper' ? 'pages' : 'percent');
 
+    const totalPages = pUnit === 'pages' ? (parseInt(document.getElementById('f-total')?.value) || null) : null;
+    const currentPage = status === 'finished'
+      ? (pUnit === 'pages' ? (totalPages ?? (_book?.total_pages ?? 0)) : 100)
+      : (parseInt(document.getElementById('f-current')?.value) || 0);
+
     const fields = {
       title,
       author:        document.getElementById('f-author').value.trim(),
@@ -351,8 +355,8 @@ const AddEditScreen = (() => {
       format:        fmt,
       status,
       progress_unit: pUnit,
-      current_page:  parseInt(document.getElementById('f-current')?.value) || 0,
-      total_pages:   pUnit === 'pages' ? (parseInt(document.getElementById('f-total')?.value) || null) : null,
+      current_page:  currentPage,
+      total_pages:   totalPages ?? (status === 'finished' ? (_book?.total_pages ?? null) : null),
     };
 
     try {
