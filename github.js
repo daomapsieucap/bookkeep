@@ -27,6 +27,16 @@ const GitHub = (() => {
     return `https://api.github.com/repos/${owner}/${repo}/contents`;
   }
 
+  /** Parse JSON from a response, surfacing the raw body if parsing fails. */
+  async function safeJson(res) {
+    const text = await res.text();
+    try {
+      return JSON.parse(text);
+    } catch {
+      throw new Error(`Unexpected response (not JSON): ${text.slice(0, 200)}`);
+    }
+  }
+
   /** GET a file — returns { content: string, sha: string } */
   async function getFile(path) {
     const res = await fetch(`${base()}/${path}`, { headers: headers() });
@@ -34,7 +44,7 @@ const GitHub = (() => {
     if (res.status === 401) throw new Error('GitHub token is invalid or expired — update it in Settings.');
     if (res.status === 403) throw new Error('GitHub token lacks write permission — update it in Settings.');
     if (!res.ok) throw new Error(`GitHub GET ${path}: ${res.status} ${await res.text()}`);
-    const data = await res.json();
+    const data = await safeJson(res);
     const raw = atob(data.content.replace(/\n/g, ''));
     const content = new TextDecoder('utf-8').decode(
       Uint8Array.from(raw, c => c.charCodeAt(0))
@@ -62,7 +72,7 @@ const GitHub = (() => {
       if (res.status === 403) throw new Error('GitHub token lacks write permission — update it in Settings.');
       throw new Error(`GitHub PUT ${path}: ${res.status} ${await res.text()}`);
     }
-    const data = await res.json();
+    const data = await safeJson(res);
     return data.content.sha;
   }
 
@@ -85,7 +95,7 @@ const GitHub = (() => {
       body: JSON.stringify(body),
     });
     if (!res.ok) throw new Error(`GitHub PUT binary ${path}: ${res.status} ${await res.text()}`);
-    const data = await res.json();
+    const data = await safeJson(res);
     return data.content.sha;
   }
 
@@ -108,7 +118,7 @@ const GitHub = (() => {
     const res = await fetch(`${base()}/${path}`, { headers: headers() });
     if (res.status === 404) return [];
     if (!res.ok) throw new Error(`GitHub LIST ${path}: ${res.status} ${await res.text()}`);
-    return res.json();
+    return safeJson(res);
   }
 
   /**
@@ -121,7 +131,7 @@ const GitHub = (() => {
     if (res.status === 401) throw new Error('GitHub token is invalid or expired — update it in Settings.');
     if (res.status === 403) throw new Error('GitHub token lacks write permission — update it in Settings.');
     if (!res.ok) throw new Error(`GitHub HEAD ${path}: ${res.status}`);
-    const data = await res.json();
+    const data = await safeJson(res);
     return data.sha;
   }
 
