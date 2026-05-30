@@ -321,14 +321,10 @@ const BookDetailScreen = (() => {
       screen.querySelector('#hl-gallery-input').click();
     });
     screen.querySelector('#hl-camera-input').addEventListener('change', e => {
-      const files = Array.from(e.target.files);
-      e.target.value = '';
-      if (files.length) handleHighlightFiles(files);
+      if (e.target.files.length) handleHighlightFiles(Array.from(e.target.files));
     });
     screen.querySelector('#hl-gallery-input').addEventListener('change', e => {
-      const files = Array.from(e.target.files);
-      e.target.value = '';
-      if (files.length) handleHighlightFiles(files);
+      if (e.target.files.length) handleHighlightFiles(Array.from(e.target.files));
     });
 
     // Highlight menus
@@ -530,7 +526,7 @@ const BookDetailScreen = (() => {
         <div class="highlight-thumb-wrap bg-red-50 flex items-center justify-center">
           <span class="text-xs text-red-400 p-2 text-center">Upload failed</span>
         </div>`;
-      Toast.error('Upload failed: ' + e.message);
+      Toast.error('Upload failed: ' + (e?.message || String(e) || 'unknown error'));
     }
   }
 
