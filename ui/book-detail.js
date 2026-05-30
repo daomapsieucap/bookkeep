@@ -119,7 +119,7 @@ const BookDetailScreen = (() => {
           <h3 class="font-semibold text-stone-700 text-sm uppercase tracking-wide">Highlights</h3>
         </div>
         <div class="flex gap-2 mb-3">
-          <button id="hl-camera-btn"
+          <button type="button" id="hl-camera-btn"
             class="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border-2 border-dashed border-blue-200 text-blue-500 text-sm font-medium active:opacity-60">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -128,7 +128,7 @@ const BookDetailScreen = (() => {
             </svg>
             Camera
           </button>
-          <button id="hl-gallery-btn"
+          <button type="button" id="hl-gallery-btn"
             class="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border-2 border-dashed border-yellow-300 text-yellow-700 text-sm font-medium active:opacity-60">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -138,7 +138,7 @@ const BookDetailScreen = (() => {
           </button>
         </div>
         <input id="hl-camera-input" type="file" accept="image/*" capture="environment" class="hidden" />
-        <input id="hl-gallery-input" type="file" accept="image/*" multiple class="hidden" />
+        <input id="hl-gallery-input" type="file" accept="image/*" class="hidden" />
         <div id="highlights-grid" class="highlight-grid">
           ${renderHighlightGrid()}
         </div>
@@ -321,10 +321,14 @@ const BookDetailScreen = (() => {
       screen.querySelector('#hl-gallery-input').click();
     });
     screen.querySelector('#hl-camera-input').addEventListener('change', e => {
-      if (e.target.files.length) handleHighlightFiles(Array.from(e.target.files));
+      const files = Array.from(e.target.files);
+      e.target.value = '';
+      if (files.length) handleHighlightFiles(files);
     });
     screen.querySelector('#hl-gallery-input').addEventListener('change', e => {
-      if (e.target.files.length) handleHighlightFiles(Array.from(e.target.files));
+      const files = Array.from(e.target.files);
+      e.target.value = '';
+      if (files.length) handleHighlightFiles(files);
     });
 
     // Highlight menus
