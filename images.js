@@ -9,8 +9,8 @@
  */
 
 const Images = (() => {
-  const OPTS_DISPLAY = { maxWidthOrHeight: 2000, useWebWorker: true, fileType: 'image/jpeg', initialQuality: 0.80 };
-  const OPTS_THUMB   = { maxWidthOrHeight: 400,  useWebWorker: true, fileType: 'image/jpeg', initialQuality: 0.80 };
+  const OPTS_DISPLAY = { maxWidthOrHeight: 2000, useWebWorker: false, fileType: 'image/jpeg', initialQuality: 0.80 };
+  const OPTS_THUMB   = { maxWidthOrHeight: 400,  useWebWorker: false, fileType: 'image/jpeg', initialQuality: 0.80 };
 
   /** Compress a File to two JPEG blobs: { display, thumb } */
   async function compress(file) {
@@ -26,7 +26,7 @@ const Images = (() => {
     return new Promise((resolve, reject) => {
       const fr = new FileReader();
       fr.onload = () => resolve(fr.result);
-      fr.onerror = reject;
+      fr.onerror = () => reject(new Error(fr.error?.message || 'FileReader failed'));
       fr.readAsArrayBuffer(blob);
     });
   }

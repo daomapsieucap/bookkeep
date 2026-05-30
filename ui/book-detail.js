@@ -138,7 +138,7 @@ const BookDetailScreen = (() => {
           </button>
         </div>
         <input id="hl-camera-input" type="file" accept="image/*" capture="environment" class="hidden" />
-        <input id="hl-gallery-input" type="file" accept="image/*" class="hidden" />
+        <input id="hl-gallery-input" type="file" accept="image/*" multiple class="hidden" />
         <div id="highlights-grid" class="highlight-grid">
           ${renderHighlightGrid()}
         </div>
