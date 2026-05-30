@@ -11,6 +11,9 @@ const Store = (() => {
 
   function toSlug(title) {
     return title
+      .normalize('NFD')
+      .replace(/\p{Mn}/gu, '')   // strip all combining diacritical marks
+      .replace(/[đĐ]/g, 'd')    // đ doesn't decompose via NFD
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-|-$/g, '')
