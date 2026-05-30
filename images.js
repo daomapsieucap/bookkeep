@@ -9,28 +9,55 @@
  */
 
 const Images = (() => {
-  const OPTS_DISPLAY = { maxWidthOrHeight: 2000, useWebWorker: false, fileType: 'image/jpeg', initialQuality: 0.80 };
-  const OPTS_THUMB   = { maxWidthOrHeight: 400,  useWebWorker: false, fileType: 'image/jpeg', initialQuality: 0.80 };
+
+  /** Resize + compress a File to a JPEG Blob via Canvas. */
+  function compressToJpeg(file, maxPx, quality) {
+    return new Promise((resolve, reject) => {
+      const url = URL.createObjectURL(file);
+      const img  = new Image();
+
+      img.onload = () => {
+        URL.revokeObjectURL(url);
+
+        let w = img.naturalWidth;
+        let h = img.naturalHeight;
+        if (w > maxPx || h > maxPx) {
+          if (w >= h) { h = Math.round((h / w) * maxPx); w = maxPx; }
+          else        { w = Math.round((w / h) * maxPx); h = maxPx; }
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width  = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) { reject(new Error('Canvas 2D not available')); return; }
+        ctx.drawImage(img, 0, 0, w, h);
+
+        canvas.toBlob(
+          blob => blob ? resolve(blob) : reject(new Error('Canvas toBlob returned null')),
+          'image/jpeg',
+          quality,
+        );
+      };
+
+      img.onerror = () => {
+        URL.revokeObjectURL(url);
+        reject(new Error('Failed to decode image'));
+      };
+
+      img.src = url;
+    });
+  }
 
   /** Compress a File to two JPEG blobs: { display, thumb } */
   async function compress(file) {
     console.log('[compress] start — name:', file.name, 'size:', file.size, 'type:', file.type);
-    try {
-      const [display, thumb] = await Promise.all([
-        imageCompression(file, OPTS_DISPLAY),
-        imageCompression(file, OPTS_THUMB),
-      ]);
-      console.log('[compress] done — display:', display.size, 'thumb:', thumb.size);
-      return { display, thumb };
-    } catch (e) {
-      // imageCompression sometimes rejects with a DOM Event instead of an Error
-      if (e instanceof Error) throw e;
-      const detail = Object.prototype.toString.call(e)
-        + ' type=' + e?.type
-        + ' targetErr=' + (e?.target?.error?.message ?? e?.target?.error);
-      console.error('[compress] non-Error rejection:', e, detail);
-      throw new Error('Compression failed: ' + detail);
-    }
+    const [display, thumb] = await Promise.all([
+      compressToJpeg(file, 2000, 0.80),
+      compressToJpeg(file, 400,  0.80),
+    ]);
+    console.log('[compress] done — display:', display.size, 'thumb:', thumb.size);
+    return { display, thumb };
   }
 
   /** Read a Blob as an ArrayBuffer */
