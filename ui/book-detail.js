@@ -248,8 +248,12 @@ const BookDetailScreen = (() => {
     if (!wrap) return;
     try {
       const url = await GitHub.loadImage(_meta.cover_thumb);
-      _coverUrl = url;
-      wrap.innerHTML = `<img src="${url}" class="book-cover w-full" />`;
+      if (url) {
+        _coverUrl = url;
+        wrap.innerHTML = `<img src="${url}" class="book-cover w-full" />`;
+      } else {
+        wrap.innerHTML = `<div class="cover-placeholder w-full" style="min-height:9rem"></div>`;
+      }
     } catch {
       wrap.innerHTML = `<div class="cover-placeholder w-full" style="min-height:9rem"></div>`;
     }
@@ -261,13 +265,18 @@ const BookDetailScreen = (() => {
       const src = img.dataset.src;
       img.removeAttribute('data-src');
       try {
-        img.src = await GitHub.loadImage(src);
-        img.style.opacity = '1';
-        // Clicking thumbnail opens full-res in new tab
-        img.style.cursor = 'pointer';
-        const hid = img.closest('[data-hid]')?.dataset.hid;
-        if (hid) {
-          img.addEventListener('click', () => openHighlightFullRes(hid));
+        const url = await GitHub.loadImage(src);
+        if (url) {
+          img.src = url;
+          img.style.opacity = '1';
+          img.style.cursor = 'pointer';
+          const hid = img.closest('[data-hid]')?.dataset.hid;
+          if (hid) {
+            img.addEventListener('click', () => openHighlightFullRes(hid));
+          }
+        } else {
+          img.closest('.highlight-thumb-wrap').innerHTML =
+            `<div class="w-full h-full bg-stone-200 flex items-center justify-center text-xs text-stone-400">No image</div>`;
         }
       } catch {
         img.closest('.highlight-thumb-wrap').innerHTML =
@@ -618,7 +627,7 @@ const BookDetailScreen = (() => {
       GitHub.evictImage(h.thumb);
       const url = await GitHub.loadImage(h.thumb);
       const img = tile?.querySelector('img');
-      if (img) img.src = url;
+      if (img && url) img.src = url;
 
       Toast.success('Image replaced.');
     } catch (e) {

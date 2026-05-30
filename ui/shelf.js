@@ -193,7 +193,12 @@ const ShelfScreen = (() => {
       const path = img.dataset.src;
       img.removeAttribute('data-src');
       try {
-        img.src = await GitHub.loadImage(path);
+        const url = await GitHub.loadImage(path);
+        if (url) {
+          img.src = url;
+        } else {
+          img.closest('.w-16').innerHTML = `<div class="cover-placeholder w-full" style="aspect-ratio:2/3"></div>`;
+        }
       } catch {
         img.closest('.w-16').innerHTML = `<div class="cover-placeholder w-full" style="aspect-ratio:2/3"></div>`;
       }

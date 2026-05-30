@@ -159,6 +159,7 @@ const GitHub = (() => {
         'Accept': 'application/vnd.github.raw',
       },
     });
+    if (res.status === 404) { _blobCache.set(path, null); return null; }
     if (!res.ok) throw new Error(`GitHub image ${path}: ${res.status}`);
     const blob = await res.blob();
     const url = URL.createObjectURL(blob);
