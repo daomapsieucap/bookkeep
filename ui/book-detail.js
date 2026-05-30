@@ -67,7 +67,10 @@ const BookDetailScreen = (() => {
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
           </svg>
         </button>
-        <h1 class="text-lg font-bold text-stone-900 truncate flex-1">${esc(m.title)}</h1>
+        <div class="flex-1 min-w-0">
+          <p class="text-xs font-semibold text-stone-400 uppercase tracking-widest">Bookkeep</p>
+          <h1 class="text-lg font-bold text-stone-900 truncate">${esc(m.title)}</h1>
+        </div>
         <button id="edit-btn"
           class="text-sm text-stone-500 font-medium active:opacity-60 shrink-0">Edit</button>
       </div>

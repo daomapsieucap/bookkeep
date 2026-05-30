@@ -61,7 +61,10 @@ const AddEditScreen = (() => {
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
           </svg>
         </button>
-        <h1 class="text-xl font-bold text-stone-900">${isEdit ? 'Edit Book' : 'Add Book'}</h1>
+        <div>
+          <p class="text-xs font-semibold text-stone-400 uppercase tracking-widest">Bookkeep</p>
+          <h1 class="text-xl font-bold text-stone-900">${isEdit ? 'Edit Book' : 'Add Book'}</h1>
+        </div>
       </div>
 
       <form id="book-form" class="px-4 pb-8 space-y-5">

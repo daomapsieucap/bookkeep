@@ -19,8 +19,11 @@ const ShelfScreen = (() => {
   function render() {
     const screen = document.getElementById('screen');
     screen.innerHTML = `
-      <div class="flex items-center justify-between px-4 pt-5 pb-2">
-        <h1 class="text-2xl font-bold text-stone-900">My Shelf</h1>
+      <div class="flex items-center justify-between px-4 pt-8 pb-2">
+        <div>
+          <p class="text-xs font-semibold text-stone-400 uppercase tracking-widest mb-1">Bookkeep</p>
+          <h1 class="text-2xl font-bold text-stone-900">Library</h1>
+        </div>
         <button id="shelf-add-btn"
           class="w-9 h-9 rounded-full bg-stone-800 text-white flex items-center justify-center shadow-sm active:opacity-80">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
