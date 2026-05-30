@@ -60,21 +60,14 @@ const Images = (() => {
 
   /** Compress a File to two JPEG blobs: { display, thumb } */
   async function compress(file) {
-    console.log('[compress] start — name:', file.name, 'size:', file.size, 'type:', file.type);
-
     let source = file;
     const isHeic = /heic|heif/i.test(file.type) || /\.(heic|heif)$/i.test(file.name);
-    if (isHeic) {
-      console.log('[compress] HEIC detected — converting to JPEG…');
-      source = await convertHeic(file);
-      console.log('[compress] converted, size:', source.size);
-    }
+    if (isHeic) source = await convertHeic(file);
 
     const [display, thumb] = await Promise.all([
       compressToJpeg(source, 2000, 0.80),
       compressToJpeg(source, 400,  0.80),
     ]);
-    console.log('[compress] done — display:', display.size, 'thumb:', thumb.size);
     return { display, thumb };
   }
 
@@ -141,9 +134,7 @@ const Images = (() => {
     const [dBuf, tBuf] = await Promise.all([blobToBuffer(display), blobToBuffer(thumb)]);
 
     await GitHub.putBinaryFile(displayPath, dBuf, existingDisplaySha, `Highlight ${id}: ${slug}`);
-    console.log('[uploadHighlight] display uploaded:', displayPath);
     await GitHub.putBinaryFile(thumbPath,   tBuf, existingThumbSha,   `Highlight thumb ${id}: ${slug}`);
-    console.log('[uploadHighlight] thumb uploaded:', thumbPath);
 
     GitHub.evictImage(displayPath);
     GitHub.evictImage(thumbPath);

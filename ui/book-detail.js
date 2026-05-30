@@ -259,7 +259,6 @@ const BookDetailScreen = (() => {
     const imgs = document.querySelectorAll('.hl-lazy[data-src]');
     for (const img of imgs) {
       const src = img.dataset.src;
-      console.log('[loadHighlightThumbs] fetching:', src);
       img.removeAttribute('data-src');
       try {
         img.src = await GitHub.loadImage(src);
@@ -270,8 +269,7 @@ const BookDetailScreen = (() => {
         if (hid) {
           img.addEventListener('click', () => openHighlightFullRes(hid));
         }
-      } catch (err) {
-        console.error('[loadHighlightThumbs] failed for path:', src, err);
+      } catch {
         img.closest('.highlight-thumb-wrap').innerHTML =
           `<div class="w-full h-full bg-stone-200 flex items-center justify-center text-xs text-stone-400">Error</div>`;
       }
@@ -505,12 +503,10 @@ const BookDetailScreen = (() => {
         caption: '',
         added_date: today,
       };
-      console.log('[uploadNewHighlight] storing highlight:', JSON.stringify(highlight));
       await Store.addHighlight(_slug, highlight);
       _meta.highlights = [...(_meta.highlights || []), highlight];
 
       // Replace placeholder with real thumbnail
-      console.log('[uploadNewHighlight] loading thumb from GitHub:', thumbPath);
       const url = await GitHub.loadImage(thumbPath);
       placeholder.innerHTML = `
         <div class="highlight-thumb-wrap">
@@ -526,11 +522,6 @@ const BookDetailScreen = (() => {
       });
 
     } catch (e) {
-      console.error('[highlight upload] raw error:', e);
-      console.error('[highlight upload] type:', Object.prototype.toString.call(e));
-      if (e instanceof Event) {
-        console.error('[highlight upload] event.type:', e.type, '| target.error:', e.target?.error);
-      }
       const msg = e instanceof Error
         ? e.message
         : e instanceof Event
