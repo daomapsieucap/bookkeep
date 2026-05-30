@@ -92,7 +92,23 @@ const ShelfScreen = (() => {
 
     if (filtered.length === 0) return renderEmpty();
 
-    return filtered.map(book => renderCard(book)).join('');
+    const sorted = [...filtered].sort((a, b) => {
+      const da = sortKey(a);
+      const db = sortKey(b);
+      if (!da && !db) return 0;
+      if (!da) return 1;
+      if (!db) return -1;
+      return db.localeCompare(da); // ISO dates: lexicographic desc = newest first
+    });
+
+    return sorted.map(book => renderCard(book)).join('');
+  }
+
+  function sortKey(book) {
+    if (_activeTab === 'finished') {
+      return book.finished_date || book.updated_date || book.added_date || '';
+    }
+    return book.updated_date || book.added_date || '';
   }
 
   function renderEmpty() {
