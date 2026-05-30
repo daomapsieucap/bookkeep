@@ -27,6 +27,11 @@ const GitHub = (() => {
     return `https://api.github.com/repos/${owner}/${repo}/contents`;
   }
 
+  /** fetch wrapper that bypasses the HTTP cache on every request. */
+  function ghFetch(url, opts = {}) {
+    return fetch(url, { cache: 'no-store', ...opts });
+  }
+
   /** Parse JSON from a response, surfacing the raw body if parsing fails. */
   async function safeJson(res) {
     const text = await res.text();
@@ -39,7 +44,7 @@ const GitHub = (() => {
 
   /** GET a file — returns { content: string, sha: string } */
   async function getFile(path) {
-    const res = await fetch(`${base()}/${path}`, { headers: headers() });
+    const res = await ghFetch(`${base()}/${path}`, { headers: headers() });
     if (res.status === 404) return null;
     if (res.status === 401) throw new Error('GitHub token is invalid or expired — update it in Settings.');
     if (res.status === 403) throw new Error('GitHub token lacks write permission — update it in Settings.');
@@ -62,7 +67,7 @@ const GitHub = (() => {
     };
     if (sha) body.sha = sha;
 
-    const res = await fetch(`${base()}/${path}`, {
+    const res = await ghFetch(`${base()}/${path}`, {
       method: 'PUT',
       headers: headers({ 'Content-Type': 'application/json' }),
       body: JSON.stringify(body),
@@ -89,7 +94,7 @@ const GitHub = (() => {
     };
     if (sha) body.sha = sha;
 
-    const res = await fetch(`${base()}/${path}`, {
+    const res = await ghFetch(`${base()}/${path}`, {
       method: 'PUT',
       headers: headers({ 'Content-Type': 'application/json' }),
       body: JSON.stringify(body),
@@ -101,7 +106,7 @@ const GitHub = (() => {
 
   /** DELETE a file. */
   async function deleteFile(path, sha, message) {
-    const res = await fetch(`${base()}/${path}`, {
+    const res = await ghFetch(`${base()}/${path}`, {
       method: 'DELETE',
       headers: headers({ 'Content-Type': 'application/json' }),
       body: JSON.stringify({ message: message || `Delete ${path}`, sha }),
@@ -115,7 +120,7 @@ const GitHub = (() => {
 
   /** List directory contents — returns array of { name, path, sha, type } */
   async function listDir(path) {
-    const res = await fetch(`${base()}/${path}`, { headers: headers() });
+    const res = await ghFetch(`${base()}/${path}`, { headers: headers() });
     if (res.status === 404) return [];
     if (!res.ok) throw new Error(`GitHub LIST ${path}: ${res.status} ${await res.text()}`);
     return safeJson(res);
@@ -126,7 +131,7 @@ const GitHub = (() => {
    * Returns null if not found.
    */
   async function getSha(path) {
-    const res = await fetch(`${base()}/${path}`, { headers: headers() });
+    const res = await ghFetch(`${base()}/${path}`, { headers: headers() });
     if (res.status === 404) return null;
     if (res.status === 401) throw new Error('GitHub token is invalid or expired — update it in Settings.');
     if (res.status === 403) throw new Error('GitHub token lacks write permission — update it in Settings.');
@@ -148,7 +153,7 @@ const GitHub = (() => {
   async function loadImage(path) {
     if (_blobCache.has(path)) return _blobCache.get(path);
 
-    const res = await fetch(`${base()}/${path}`, {
+    const res = await ghFetch(`${base()}/${path}`, {
       headers: {
         ...headers(),
         'Accept': 'application/vnd.github.raw',
@@ -172,7 +177,7 @@ const GitHub = (() => {
   /** Validate PAT + repo by fetching the repo metadata. Returns { ok, message }. */
   async function validate(pat, owner, repo) {
     try {
-      const res = await fetch(`https://api.github.com/repos/${owner}/${repo}`, {
+      const res = await ghFetch(`https://api.github.com/repos/${owner}/${repo}`, {
         headers: {
           'Authorization': `Bearer ${pat}`,
           'Accept': 'application/vnd.github+json',
