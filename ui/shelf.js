@@ -105,10 +105,7 @@ const ShelfScreen = (() => {
   }
 
   function sortKey(book) {
-    if (_activeTab === 'finished') {
-      return book.finished_date || book.updated_date || book.added_date || '';
-    }
-    return book.updated_date || book.added_date || '';
+    return book.finished_date || book.updated_date || book.added_date || '';
   }
 
   function renderEmpty() {
