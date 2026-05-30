@@ -43,12 +43,36 @@ const Images = (() => {
     });
   }
 
+  /** Lazy-load heic2any and convert a HEIC/HEIF File to a JPEG Blob. */
+  async function convertHeic(file) {
+    if (!window.heic2any) {
+      await new Promise((resolve, reject) => {
+        const s = document.createElement('script');
+        s.src = 'https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js';
+        s.onload = resolve;
+        s.onerror = () => reject(new Error('Failed to load HEIC converter'));
+        document.head.appendChild(s);
+      });
+    }
+    const result = await window.heic2any({ blob: file, toType: 'image/jpeg', quality: 0.92 });
+    return Array.isArray(result) ? result[0] : result;
+  }
+
   /** Compress a File to two JPEG blobs: { display, thumb } */
   async function compress(file) {
     console.log('[compress] start — name:', file.name, 'size:', file.size, 'type:', file.type);
+
+    let source = file;
+    const isHeic = /heic|heif/i.test(file.type) || /\.(heic|heif)$/i.test(file.name);
+    if (isHeic) {
+      console.log('[compress] HEIC detected — converting to JPEG…');
+      source = await convertHeic(file);
+      console.log('[compress] converted, size:', source.size);
+    }
+
     const [display, thumb] = await Promise.all([
-      compressToJpeg(file, 2000, 0.80),
-      compressToJpeg(file, 400,  0.80),
+      compressToJpeg(source, 2000, 0.80),
+      compressToJpeg(source, 400,  0.80),
     ]);
     console.log('[compress] done — display:', display.size, 'thumb:', thumb.size);
     return { display, thumb };
