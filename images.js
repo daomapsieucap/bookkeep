@@ -14,11 +14,23 @@ const Images = (() => {
 
   /** Compress a File to two JPEG blobs: { display, thumb } */
   async function compress(file) {
-    const [display, thumb] = await Promise.all([
-      imageCompression(file, OPTS_DISPLAY),
-      imageCompression(file, OPTS_THUMB),
-    ]);
-    return { display, thumb };
+    console.log('[compress] start — name:', file.name, 'size:', file.size, 'type:', file.type);
+    try {
+      const [display, thumb] = await Promise.all([
+        imageCompression(file, OPTS_DISPLAY),
+        imageCompression(file, OPTS_THUMB),
+      ]);
+      console.log('[compress] done — display:', display.size, 'thumb:', thumb.size);
+      return { display, thumb };
+    } catch (e) {
+      // imageCompression sometimes rejects with a DOM Event instead of an Error
+      if (e instanceof Error) throw e;
+      const detail = Object.prototype.toString.call(e)
+        + ' type=' + e?.type
+        + ' targetErr=' + (e?.target?.error?.message ?? e?.target?.error);
+      console.error('[compress] non-Error rejection:', e, detail);
+      throw new Error('Compression failed: ' + detail);
+    }
   }
 
   /** Read a Blob as an ArrayBuffer */
@@ -84,7 +96,9 @@ const Images = (() => {
     const [dBuf, tBuf] = await Promise.all([blobToBuffer(display), blobToBuffer(thumb)]);
 
     await GitHub.putBinaryFile(displayPath, dBuf, existingDisplaySha, `Highlight ${id}: ${slug}`);
+    console.log('[uploadHighlight] display uploaded:', displayPath);
     await GitHub.putBinaryFile(thumbPath,   tBuf, existingThumbSha,   `Highlight thumb ${id}: ${slug}`);
+    console.log('[uploadHighlight] thumb uploaded:', thumbPath);
 
     GitHub.evictImage(displayPath);
     GitHub.evictImage(thumbPath);

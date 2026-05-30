@@ -259,6 +259,7 @@ const BookDetailScreen = (() => {
     const imgs = document.querySelectorAll('.hl-lazy[data-src]');
     for (const img of imgs) {
       const src = img.dataset.src;
+      console.log('[loadHighlightThumbs] fetching:', src);
       img.removeAttribute('data-src');
       try {
         img.src = await GitHub.loadImage(src);
@@ -269,7 +270,8 @@ const BookDetailScreen = (() => {
         if (hid) {
           img.addEventListener('click', () => openHighlightFullRes(hid));
         }
-      } catch {
+      } catch (err) {
+        console.error('[loadHighlightThumbs] failed for path:', src, err);
         img.closest('.highlight-thumb-wrap').innerHTML =
           `<div class="w-full h-full bg-stone-200 flex items-center justify-center text-xs text-stone-400">Error</div>`;
       }
@@ -503,10 +505,12 @@ const BookDetailScreen = (() => {
         caption: '',
         added_date: today,
       };
+      console.log('[uploadNewHighlight] storing highlight:', JSON.stringify(highlight));
       await Store.addHighlight(_slug, highlight);
       _meta.highlights = [...(_meta.highlights || []), highlight];
 
       // Replace placeholder with real thumbnail
+      console.log('[uploadNewHighlight] loading thumb from GitHub:', thumbPath);
       const url = await GitHub.loadImage(thumbPath);
       placeholder.innerHTML = `
         <div class="highlight-thumb-wrap">
